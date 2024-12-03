@@ -79,7 +79,7 @@ app.get('/fetchDealers/:state', async (req, res) => {
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
   try {
-    const document = await Dealerships.findById({id: req.params.id});
+    const document = await Dealerships.findOne({id: Number(req.params.id)});
     res.json(document);
   } catch (error) {
     res.status(500).json({ error: 'Error fetching documents' });

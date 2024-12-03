@@ -17,16 +17,33 @@ logger = logging.getLogger(__name__)
 
 
 def get_cars(request):
-    count = CarMake.objects.filter().count()
-    print(count)
-    if (count == 0):
-        initiate()
-    car_models = CarModel.objects.select_related('car_make')
-    cars = []
-    for car_model in car_models:
-        cars.append({"CarModel": car_model.name,
-                     "CarMake": car_model.car_make.name})
-    return JsonResponse({"CarModels": cars})
+    try:
+        count = CarMake.objects.filter().count()
+        logger.info(f"Number of CarMakes found: {count}")
+        
+        if count == 0:
+            logger.info("No CarMakes found. Initiating default data.")
+            initiate()
+        
+        car_models = CarModel.objects.select_related('car_make')
+        cars = [
+            {"CarModel": car_model.name, "CarMake": car_model.car_make.name}
+            for car_model in car_models
+        ]
+        
+        logger.info(f"Retrieved {len(cars)} car models successfully.")
+        return JsonResponse({"CarModels": cars})
+    
+    except Exception as err:
+        logger.error("Error in getting cars", exc_info=True)
+        return JsonResponse(
+            {
+                "status": 401,
+                "message": "Error in getting cars",
+                "error": str(err),
+            },
+            status=401
+        )
 
 # Create your views here.
 
